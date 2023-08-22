@@ -33,13 +33,10 @@ The **CRELAT** is a tool designed to facilitate the analysis of character relati
 
 We welcome contributions to enhance the functionality and usability of the Book Characters Relationship Analyzer. Feel free to open issues for suggestions or bug reports. If you'd like to contribute code, fork the repository, create a feature branch, commit your changes, and open a pull request.
 
-## License
-
-This project is licensed under the **MIT License**, allowing you to modify and distribute the code for personal and commercial use.
-
 ## Acknowledgments
 
-This tool was inspired by the need for a more structured approach to character relationship analysis in literature. We extend our gratitude to the open-source community for their valuable libraries and tools that make projects like this possible.
+This tool was inspired by the need for a more structured approach to character relationship analysis in literature. 
+We extend our gratitude to the open-source community for their valuable libraries and tools that make projects like this possible.
 
 ---
 
