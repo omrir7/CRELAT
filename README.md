@@ -21,7 +21,7 @@ The **CRELAT** is a tool designed to facilitate the analysis of character relati
 
 ## Getting Started
 
-1. **Clone the Repository:** Start by cloning this repository to your local machine using `git clone [https://github.com/omrir7/CRELAT.git](https://github.com/omrir7/CRELAT.git)`.
+1. **Clone the Repository:** Start by cloning this repository to your local machine using `git clone https://github.com/omrir7/CRELAT.git'.
 
 2. **Install Dependencies:** Navigate to the project directory and install the required dependencies by running `pip install -r requirements.txt`.
 
