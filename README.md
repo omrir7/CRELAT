@@ -43,7 +43,7 @@ We extend our gratitude to the open-source community for their valuable librarie
 Happy analyzing! Your feedback and contributions are highly appreciated. For questions or support, please reach out to [omrirafa@post.bgu.ac.il](omrirafa@post.bgu.ac.il).
 Just copy and paste the above Markdown code into your repository's README.md file, and it should display with the appropriate formatting.
 
-Please Note: This project is currently in active development and is not yet considered complete.
+**Please Note: This project is currently in active development and is not yet considered complete.**
 
 
 
