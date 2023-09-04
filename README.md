@@ -25,7 +25,7 @@ The **CRELAT** is a tool designed to facilitate the analysis of character relati
 
 2. **Install Dependencies:** Navigate to the project directory and install the required dependencies by running `pip install -r requirements.txt`.
 
-3. **Run the Tool:** Launch the tool by running `python analyze_book.py --book <path-to-book-file>` in your terminal. Follow the on-screen instructions to choose the book and set analysis options.
+3. **Run the Tool:** Launch the tool by running `python src/RunCRELAT_Book.py --book <path-to-book-file> --ent <path-to-entities-file>` in your terminal. Follow the on-screen instructions to choose the book and set analysis options.
 
 4. **Explore Results:** Once the analysis is complete, explore the generated graphs and character profiles in the `output` directory.
 
