@@ -57,7 +57,7 @@ class Book:
                 words.append(r)
         words_lower = [word.lower() for word in words]
         self.no_stop_words_list = words_lower
-        print("RemoveStopWords Done")
+        print("(RemoveStopWords) Done")
 
     def index_2d(self, names2d, appearance):
         # if (appearance=="yonatan"):
@@ -73,7 +73,7 @@ class Book:
             entity_apear = self.index_2d(self.entities, self.one_ref_list[i])
             if entity_apear is not False:
                 self.one_ref_list[i] = self.entities[entity_apear][0]
-        print("ToOneRef Done")
+        print("(ToOneRef) Done")
     def BookName(self):
         print(self.book_name)
     def NumOfEntities(self):
@@ -83,7 +83,7 @@ class Book:
         self.co_occurances_raw = co_occurances
     def TrainW2VModel(self, vector_size,window_size,output_path): #otput path without file, only directory
         if not os.path.exists(output_path):
-            raise Exception(f"Corpus path '{output_path}' does not exist.")
+            raise Exception(f"Output path '{output_path}' does not exist.")
             return False
         self.w2v_vectors = W2V.TrainW2VModel(self.book_name,self.one_ref_list,vector_size,window_size,output_path)
     def GenW2V(self):
@@ -103,8 +103,11 @@ class Book:
             title = self.book_name + " W2V Cosine Similarity"
         Graphs.PlotGraph(data,save_plot,save_path,title)
     def PrintChars(self):
+        i=1
+        print("(Entities)")
         for char in self.entities:
-            print(char)
+            print(f"{i}. {char}")
+            i+=1
     def SubGraph(self,data_sel0,data_sel1,save_plot,save_path):
         #Normalizing Co_Ocuurances to be 0-1
         co_oc_max = max([i[2] for i in self.co_occurances_raw])
@@ -216,9 +219,6 @@ class Book:
         # Update the DataFrame with the additional values
         for index, row in df.iterrows():
             charA, charB = row['char1'], row['char2']
-            print([charA,charB])
-            if (charA=='havisham' and charB=='compeyson'):
-                print(1)
             key = frozenset([charA, charB])
             if key in values_dict:
                 values = values_dict[key]

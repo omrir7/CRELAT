@@ -23,6 +23,5 @@ def Cluster(data, n_cluters):
 
 
     clusters_centers =  kmeans.cluster_centers_
-    print('done')
     return clusters_labels, clusters_centers
 

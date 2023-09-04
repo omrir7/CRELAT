@@ -8,18 +8,46 @@ from networkx.drawing.nx_agraph import graphviz_layout
 from sklearn.decomposition import PCA
 
 # raw_data example:
+# def PlotHM1(raw_data, save_plot, save_path):
+#     # Convert the data into a pandas dataframe
+#     df = pd.DataFrame(raw_data, columns=['char1', 'char2', 'value'])
+#
+#     # Pivot the dataframe to create a matrix
+#     matrix = df.pivot(index='char1', columns='char2', values='value')
+#
+#     # Create the heatmap using seaborn
+#     sns.heatmap(matrix, cmap='coolwarm', annot=True, fmt='.1f')
+#     if save_plot==True:
+#         plt.savefig(save_path)
+#     plt.show()
+
+
 def PlotHM(raw_data, save_plot, save_path):
     # Convert the data into a pandas dataframe
+    G = nx.Graph()
     df = pd.DataFrame(raw_data, columns=['char1', 'char2', 'value'])
 
-    # Pivot the dataframe to create a matrix
-    matrix = df.pivot(index='char1', columns='char2', values='value')
+    # Get a list of unique characters to define the order of axes
+    characters = sorted(list(set(df['char1'].tolist() + df['char2'].tolist())))
 
+    # Pivot the dataframe to create a matrix with characters in a specific order
+    matrix = df.pivot(index='char1', columns='char2', values='value')
+    matrix = matrix.reindex(index=characters[::-1], columns=characters[::-1])  # Reversed order
+    matrix = matrix.fillna(0)
     # Create the heatmap using seaborn
-    sns.heatmap(matrix, cmap='coolwarm', annot=True, fmt='.1f')
-    if save_plot==True:
+    ax = sns.heatmap(matrix, cmap='coolwarm', annot=True, fmt='.1f')
+
+    # Ensure same labels on both x and y axes
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
+    ax.set_yticklabels(ax.get_yticklabels(), rotation=0)
+
+    if save_plot:
         plt.savefig(save_path)
-    plt.show()
+    plt.close()
+    print("(PlotHM) Done")
+
+
+
 
 def PlotCov(matrix,book_names):
     # Create a seaborn heatmap
@@ -58,17 +86,8 @@ def PlotGraph(raw_data, save_plot, save_path,title,draw_edges = 1, num_of_books=
     # Add the edges to the graph with their weights
     for edge in raw_data:
         G.add_edge(edge[0], edge[1], weight=round(edge[2],2))
-
-    k = sum([edge[2] for edge in raw_data]) / len(raw_data)
-
     # Set the position of the nodes for visualization
     pos1 = nx.spring_layout(G,weight='weight', scale=10)
-    #pos1 = nx.circular_layout(G)
-    # Draw the graph with node labels and edge weights
-    # nx.draw_networkx_nodes(G, pos)
-    # nx.draw_networkx_labels(G, pos)
-    # nx.draw_networkx_edges(G, pos, width=[d['weight']*5 for (u, v, d) in G.edges(data=True)])
-    # nx.draw_networkx_edge_labels(G, pos, edge_labels={(u, v): d['weight'] for (u, v, d) in G.edges(data=True)})
     # Draw the nodes and edges
     plt.figure(figsize=(16, 16))
     plt.title(title)
@@ -77,11 +96,8 @@ def PlotGraph(raw_data, save_plot, save_path,title,draw_edges = 1, num_of_books=
         nx.draw_networkx_nodes(G, pos1, node_size=400,node_color=node_colors)
     else:
         nx.draw_networkx_nodes(G, pos1, node_size=400)
-
-    #nx.draw_networkx_edges(G, pos, width=[d['weight'] * 2 for (u, v, d) in G.edges(data=True)], edge_color='gray',
-    #                       edge_cmap=plt.cm.Blues, edge_vmin=0, edge_vmax=1)
     if draw_edges:
-        nx.draw_networkx_edges(G, pos1, width=1, edge_color='gray',
+        nx.draw_networkx_edges(G, pos1, width=2, edge_color='gray',
                                edge_cmap=plt.cm.Blues, edge_vmin=0, edge_vmax=1)
     # Add the labels to the nodes
     labels = {}
@@ -99,7 +115,8 @@ def PlotGraph(raw_data, save_plot, save_path,title,draw_edges = 1, num_of_books=
         plt.savefig(save_path)
     # Show the plot
     plt.axis('off')
-    plt.show()
+    plt.close()
+    print("(PlotGraph) Done")
 def PlotW2vEmbeddings2D(embeddings_dict,corpus_entities,entities_per_book):
     names = list(embeddings_dict.keys())
     book_labels = []

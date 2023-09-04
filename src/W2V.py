@@ -48,11 +48,10 @@ def TrainW2VModel(book_name, corpus_list, vector_size,window_size,output_path):
     # Could make this an optional argument to specify output file
     with open(output_text_file[:-4]+".json", "w") as out:
         #json.dump(v, out)
-        print(output_text_file[:-4]+"json")
         json.dump(v, out)
 
 
-    print("Done - W2V Training")
+    print("(TrainW2VModel) Done")
     return v
 
 
@@ -89,6 +88,7 @@ def GenW2V(entities,vectors):
         else:
             all_pairs[i][0] = all_pairs[i][0]
             all_pairs[i][1] = all_pairs[i][1]
+    print("(GenW2V) Done")
     return all_pairs
 
 
