@@ -49,11 +49,14 @@ def main():
 
 
 #------------------------------------
-book_path = '/Users/omrirafa/Desktop/University/Thesis/CRELAT/test/Harry Potter 1/Harry Potter 1.txt'
-entities_path = '/Users/omrirafa/Desktop/University/Thesis/CRELAT/test/Harry Potter 1/Entities'
-book_name = 'Harry Potter 1'
-output_dir = '/Users/omrirafa/Desktop/University/Thesis/CRELAT/test/output'
-
+#book_path = '/Users/omrirafa/Desktop/University/Thesis/CRELAT/test/Harry Potter 1/Harry Potter 1.txt'
+#entities_path = '/Users/omrirafa/Desktop/University/Thesis/CRELAT/test/Harry Potter 1/Entities'
+#book_name = 'Harry Potter 1'
+#output_dir = '/Users/omrirafa/Desktop/University/Thesis/CRELAT/test/output'
+book_path = '../../Data/Short_Stories/The Lottery/The Lottery.txt'
+entities_path = '../../Data/Short_Stories/The Lottery/Entities'
+book_name = 'The Lottery'
+output_dir = '/home/omrirafa/CRELAT/test/output/The Lottery'
 
 
 Book1 = Book.Book(book_path, entities_path, book_name)
@@ -67,6 +70,11 @@ Book1.PlotGraph(data_sel=0,save_plot=True,save_path=f"{output_dir}/{book_name}_C
 Book1.PloHM(data_sel=0,save_plot=True,save_path=f"{output_dir}/{book_name}_CoOc_HeatMap")
 Book1.TrainW2VModel(7, 15, output_dir)
 Book1.GenW2V()
+#Bert
+Book1.extract_entity_contexts()
+Book1.inference_bert()
+Book1.average_bert_embeddings()
+Book1.Gen_Bert_Pairs()
 #W2V Cosine Graph
 Book1.PlotGraph(data_sel=1,save_plot=True,save_path=f"{output_dir}/{book_name}_Cosine_Graph")
 #W2V Cosine HM
@@ -76,5 +84,5 @@ Book1.SubGraph(data_sel0=0,data_sel1=1,save_plot=True,save_path=f"{output_dir}/{
 #Excel file with the difference between the 2 metrics for each pair of characters
 Book1.SaveDiffList(save_path=f"{output_dir}/{book_name}_Diff_List.xls")
 #cluster pairs connection according to each metric (pairs with similar values will be assign to the same cluster)
-Book1.ClusterAll(save_path=f"{output_dir}/{book_name}_Clustered.xls",n_clusters=5)
+Book1.ClusterAll_new(save_path=f"{output_dir}/{book_name}_Clustered.xls",n_clusters=5)
 print("End Of script")

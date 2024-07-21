@@ -6,11 +6,21 @@ import json
 import os
 from scipy import spatial
 import pandas as pd
+import torch
 
 def read_corpus(corpus):
     for doc in corpus:
         yield list(tokenize(doc))
-
+def remove_duplicates(data):
+    seen = set()
+    unique_data = []
+    for sublist in data:
+        # Sort the first two elements to ignore order
+        pair = tuple(sorted(sublist[:2]))
+        if pair not in seen:
+            seen.add(pair)
+            unique_data.append(sublist)
+    return unique_data
 
 def TrainW2VModel(book_name, corpus_list, vector_size,window_size,output_path):
 
@@ -64,7 +74,14 @@ def GenW2V(entities,vectors):
     for i in range(0,len(all_pairs)):
       all_pairs[i]=list(all_pairs[i])
     i = 0
+    if isinstance(all_pairs[0][0],list):
+        first_entity = all_pairs[0][0][0]
+    else:
+        first_entity = all_pairs[0][0]
+    if isinstance(vectors['vectors'][first_entity], torch.Tensor):
+        vectors['vectors'] = tensors_to_lists(vectors['vectors'])
     # compute cosine similarity
+
     while i < len(all_pairs):
         if len(all_pairs[i][0][0])>1:
             first_in_pair = all_pairs[i][0][0]
@@ -88,10 +105,17 @@ def GenW2V(entities,vectors):
         else:
             all_pairs[i][0] = all_pairs[i][0]
             all_pairs[i][1] = all_pairs[i][1]
+
+    all_pairs = remove_duplicates(all_pairs)
     print("(GenW2V) Done")
     return all_pairs
 
-
+def tensors_to_lists(tensor_dict):
+    list_dict = {}
+    for key, tensor in tensor_dict.items():
+        # Convert PyTorch tensor to list
+        list_dict[key] = tensor.tolist()
+    return list_dict
 
 
 
