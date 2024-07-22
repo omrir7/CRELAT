@@ -11,7 +11,7 @@ import Book
 
 
 # For running the test use the following command and run it from root dir:
-#python3 src/RunCRELAT_Book.py "test/Harry Potter 1/Harry Potter 1.txt" "test/Harry Potter 1/Entities" "Harry Potter 1" "test/output"
+#python3 src/RunCRELAT_Book.py "test/Harry Potter 1 1/Harry Potter 1 1.txt" "test/Harry Potter 1 1/Entities" "Harry Potter 1 1" "test/output"
 
 
 def main():
@@ -49,10 +49,10 @@ def main():
 
 
 #------------------------------------
-#book_path = '/Users/omrirafa/Desktop/University/Thesis/CRELAT/test/Harry Potter 1/Harry Potter 1.txt'
-#entities_path = '/Users/omrirafa/Desktop/University/Thesis/CRELAT/test/Harry Potter 1/Entities'
-#book_name = 'Harry Potter 1'
-#output_dir = '/Users/omrirafa/Desktop/University/Thesis/CRELAT/test/output'
+# book_path = '/home/omrirafa/CRELAT/test/Harry Potter 1/Harry Potter 1.txt'
+# entities_path = '/home/omrirafa/CRELAT/test/Harry Potter 1/Entities'
+# book_name = 'Harry Potter 1'
+# output_dir = '/home/omrirafa/CRELAT/test/output/Harry Potter 1'
 book_path = '../../Data/Short_Stories/The Lottery/The Lottery.txt'
 entities_path = '../../Data/Short_Stories/The Lottery/Entities'
 book_name = 'The Lottery'

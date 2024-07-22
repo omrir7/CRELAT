@@ -90,7 +90,9 @@ class Book:
     def GenW2V(self):
         self.w2v_pairs = W2V.GenW2V(self.entities,self.w2v_vectors)
     def Gen_Bert_Pairs(self):
-        self.bert_pairs_average = BERT_Inference_Without_Finetune.Gen_Bert_Pairs(self.entities_embeddings_averaged_bert)
+        self.bert_pairs_average_ent_emb = BERT_Inference_Without_Finetune.Gen_Bert_Pairs(self.entities_embeddings_averaged_bert)
+        self.bert_pairs_average_cls = BERT_Inference_Without_Finetune.Gen_Bert_Pairs(self.cls_averaged_bert)
+
     def PloHM(self,data_sel,save_plot,save_path):
         if data_sel==0:
             data=self.co_occurances_raw
@@ -178,17 +180,25 @@ class Book:
     def extract_entity_contexts(self, context_window=10):
         self.entities_contexts = BERT_Inference_Without_Finetune.extract_entity_contexts(self.one_ref_list,self.entities)
     def inference_bert(self, model_name = 'bert-base-uncased'):
-        self.entities_embeddings_per_context_bert = BERT_Inference_Without_Finetune.inference_bert(self.entities_contexts)
+        self.entities_embeddings_per_context_bert, self.cls_per_context = BERT_Inference_Without_Finetune.inference_bert(self.entities_contexts)
     def average_bert_embeddings(self):
         #take bert output token of the entity in all the context on which the entity appear and average them
         self.entities_embeddings_averaged_bert=dict()
+        self.cls_averaged_bert=dict()
         for entity in self.entities_embeddings_per_context_bert.keys():
-            emb_list = self.entities_embeddings_per_context_bert[entity]
+            list_ent_embeddings_bert = self.entities_embeddings_per_context_bert[entity]
+            list_cls = self.cls_per_context[entity]
+
             # Stack the tensors along a new dimension
-            stacked_tensors = torch.stack(emb_list)
+            stacked_tensors_ent_embeddings = torch.stack(list_ent_embeddings_bert)
+            stacked_tensors_cls = torch.stack(list_cls)
+
             # Calculate the mean along the new dimension
-            average_tensor = torch.mean(stacked_tensors, dim=0)
-            self.entities_embeddings_averaged_bert[entity] = average_tensor
+            average_tensor_ent_embeddings = torch.mean(stacked_tensors_ent_embeddings, dim=0)
+            average_tensor_cls = torch.mean(stacked_tensors_cls, dim=0)
+
+            self.entities_embeddings_averaged_bert[entity] = average_tensor_ent_embeddings
+            self.cls_averaged_bert[entity] = average_tensor_cls
 
     def ClusterList(self,data_sel,save_path,n_clusters):
         if data_sel==0:
@@ -288,27 +298,32 @@ class Book:
     def ClusterAll_new(self,save_path,n_clusters):
         data_cooc = self.co_occurances_raw
         data_w2v = self.w2v_pairs
-        data_bert = self.bert_pairs_average  # New metric
+        data_bert_ent_emb = self.bert_pairs_average_ent_emb  # New metric
+        data_bert_cls = self.bert_pairs_average_cls  # New metric
 
         # Perform clustering on the three datasets
         clusters_labels_cooc, clusters_centers_cooc = Clustering.Cluster(data_cooc, n_clusters)
         clusters_labels_w2v, clusters_centers_w2v = Clustering.Cluster(data_w2v, n_clusters)
-        clusters_labels_bert, clusters_centers_bert = Clustering.Cluster(data_bert, n_clusters)
+        clusters_labels_bert_ent_emb, clusters_centers_bert_ent_emb = Clustering.Cluster(data_bert_ent_emb, n_clusters)
+        clusters_labels_bert_cls, clusters_centers_bert_cls = Clustering.Cluster(data_bert_cls, n_clusters)
 
         # Sort the cluster centers
         clusters_centers_cooc1 = sorted(list(clusters_centers_cooc))
         clusters_centers_w2v1 = sorted(list(clusters_centers_w2v))
-        clusters_centers_bert1 = sorted(list(clusters_centers_bert))
+        clusters_centers_bert1_ent_emb = sorted(list(clusters_centers_bert_ent_emb))
+        clusters_centers_bert1_cls = sorted(list(clusters_centers_bert_cls))
 
         # Create mappings for the cluster labels
         cooc_map = {i: clusters_centers_cooc1.index(center) for i, center in enumerate(clusters_centers_cooc)}
         w2v_map = {i: clusters_centers_w2v1.index(center) for i, center in enumerate(clusters_centers_w2v)}
-        bert_map = {i: clusters_centers_bert1.index(center) for i, center in enumerate(clusters_centers_bert)}
+        bert_ent_emb_map = {i: clusters_centers_bert1_ent_emb.index(center) for i, center in enumerate(clusters_centers_bert_ent_emb)}
+        bert_cls_map = {i: clusters_centers_bert1_cls.index(center) for i, center in enumerate(clusters_centers_bert_cls)}
 
         # Update cluster labels with the mappings
         clusters_labels_cooc = [cooc_map[label] for label in clusters_labels_cooc]
         clusters_labels_w2v = [w2v_map[label] for label in clusters_labels_w2v]
-        clusters_labels_bert = [bert_map[label] for label in clusters_labels_bert]
+        clusters_labels_bert_ent_emb = [bert_ent_emb_map[label] for label in clusters_labels_bert_ent_emb]
+        clusters_labels_bert_cls = [bert_cls_map[label] for label in clusters_labels_bert_cls]
 
         # Append cluster labels to the original data and sort them
         def append_and_sort(data, labels):
@@ -322,10 +337,11 @@ class Book:
 
         new_list_cooc = append_and_sort(data_cooc, clusters_labels_cooc)
         new_list_w2v = append_and_sort(data_w2v, clusters_labels_w2v)
-        new_list_bert = append_and_sort(data_bert, clusters_labels_bert)
+        new_list_bert_ent_emb = append_and_sort(data_bert_ent_emb, clusters_labels_bert_ent_emb)
+        new_list_bert_cls = append_and_sort(data_bert_cls, clusters_labels_bert_cls)
 
         # Concatenate the three lists
-        concatenated_list = new_list_cooc + new_list_w2v + new_list_bert
+        concatenated_list = new_list_cooc + new_list_w2v + new_list_bert_ent_emb + new_list_bert_cls
 
         # Create a DataFrame
         df = pd.DataFrame(concatenated_list, columns=['char1', 'char2', 'Value', 'Cluster'])
@@ -349,17 +365,17 @@ class Book:
             key = frozenset([charA, charB])
             if key in values_dict:
                 values = values_dict[key]
-                if len(values) == 4:
+                if len(values) == 6:
                     # Giving couples with no CoOc value 0 with cluster that have the lowest center
                     lowest_value = min(clusters_centers_cooc1)
                     lowest_index = list(clusters_centers_cooc1).index(lowest_value)
                     values = [0, lowest_index] + values
-                modified_rows.append([charA, charB, values[0], values[1], values[2], values[3], values[4], values[5]])
+                modified_rows.append([charA, charB, values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7]])
                 values_dict.pop(key)  # Remove the used values from the dictionary
 
         # Create the final DataFrame
         df = pd.DataFrame(modified_rows,
                           columns=['char1', 'char2', 'Co-Occurances', 'Co-Occurances Cluster', 'Cosine Similarity',
-                                   'Cosine Similarity Cluster', 'BERT Similarity', 'BERT Similarity Cluster'])
+                                   'Cosine Similarity Cluster', 'BERT - Entity Embedding Similarity', 'BERT - Entity Embedding Cluster', 'BERT - CLS Similarity', 'BERT - CLS Similarity Cluster'])
         df.to_csv(save_path, index=False, sep='\t')
         print("!")

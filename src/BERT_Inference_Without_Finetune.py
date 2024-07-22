@@ -40,8 +40,10 @@ def inference_bert(entities_contexts, model = 'bert-base-uncased'):
     model = BertModel.from_pretrained(model_name)
     model.eval()
     entities_embeddings_per_context = dict()
+    cls_per_context = dict()
     for entity in entities_contexts.keys():
         entities_embeddings_per_context[entity] = []
+        cls_per_context[entity] = []
         contexts = entities_contexts[entity]
         for cont in contexts:
             # Step 2: Define your text and mask a specific token
@@ -80,7 +82,10 @@ def inference_bert(entities_contexts, model = 'bert-base-uncased'):
             # Step 7: Print the contextual embedding for the masked token
             masked_token_embedding = hidden_states[0, masked_token_index]
             entities_embeddings_per_context[entity].append(masked_token_embedding)
-    return entities_embeddings_per_context
+
+            cls = outputs.last_hidden_state[:, 0, :]
+            cls_per_context[entity].append(cls)
+    return entities_embeddings_per_context, cls_per_context
 
 def Gen_Bert_Pairs(entities_embeddings_per_context):
     all_pairs = [(a, b) for idx, a in enumerate(list(entities_embeddings_per_context.keys())) for b in list(entities_embeddings_per_context.keys())[idx + 1:]]
